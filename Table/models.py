@@ -1,6 +1,4 @@
 from django.db import models
-import json
-import re
 
 class Person(models.Model):
     GENDER_CHOICES = (
@@ -29,9 +27,6 @@ class Person(models.Model):
                     address=self.address,
                     email=self.email,
                     phone=self.phone)
-
-    def as_json(self):
-        return json.dumps({'id': self.id, 'values': self.as_dict()})
 
     def match_to(self, pattern):
         return pattern.match(self.fullname) or \

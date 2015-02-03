@@ -1,5 +1,5 @@
 body {
-    background-color: #e7ffe9;
+    background-color: #f9fff9;
     font-family: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial;
 }
 
@@ -8,11 +8,17 @@ body {
 }
 
 #header {
-    margin: 1% 5%;
+    margin: 1% 2%;
 }
 
-#header > button, #header > input, #header > label {
-    vertical-align: middle;
+#header > button {
+    margin-right: 2%;
+}
+
+.vcenter {
+    display: inline-block;
+    vertical-align: baseline;
+    float: none;
 }
 
 .grid {
@@ -25,7 +31,7 @@ body {
 
 .grid th, .grid td {
     text-align: center !important;
-    padding: 7px;
+    padding: 8px;
 }
 
 .grid td {

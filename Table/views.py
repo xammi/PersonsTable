@@ -3,7 +3,7 @@ from django.views.decorators.http import require_GET, require_POST, require_http
 from django.shortcuts import HttpResponse
 from Table.models import Person
 from django.http import HttpResponseBadRequest
-import json
+from json import dumps
 import re
 
 def require_AJAX(view):
@@ -21,6 +21,11 @@ def prepare(queryset, predicate):
     result = [{'id': query.id, 'values': query.as_dict()}
               for query in queryset if predicate(query)]
     return result
+
+
+def response_json(obj):
+    return HttpResponse(dumps(obj), mimetype="application/json")
+
 #--------------------------------------------------------------------------------------------------
 
 
@@ -42,6 +47,41 @@ def get_data(request):
     else:
         matcher = lambda person: True
 
-    persons = Person.objects.all()
-    response = prepare(persons, matcher)
-    return HttpResponse(json.dumps(response), mimetype="application/json")
+    persons = Person.objects.all()[:10]
+    data = prepare(persons, matcher)
+    return response_json(data)
+
+
+@require_AJAX
+@require_POST
+def add_person(request):
+    new_person = Person()
+    new_person.save(force_insert=True)
+    return response_json(new_person.as_dict())
+
+
+@require_AJAX
+@require_POST
+def update_person(request):
+    id = request.POST['id']
+    field = request.POST['field']
+    new_value = request.POST['new_value']
+
+    person = Person.objects.all().filter(id=id)
+    person[field] = new_value
+    person.save(force_update=True)
+
+    new_person = Person()
+    new_person.save()
+    return response_json(new_person.as_dict())
+
+
+@require_AJAX
+@require_POST
+def delete_persons(request):
+    ids = request.POST['ids']
+    for id in ids:
+        person = Person.objects.all().filter(id=id)
+        person.delete()
+
+    return response_json({'status': 'OK'})

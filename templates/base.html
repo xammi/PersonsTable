@@ -17,10 +17,12 @@
 <body>
   <div id="container" class="container-fluid">
       <div id="header" class="row">
-          <h1 class="col-md-7">Адресная книга</h1>
-          <label for="filter" class="col-md-1">Фильтр</label>
-          <input id="filter" name="filter" class="col-md-2" type="search"/>
-          <button id="updater" class="btn col-md-1 col-md-offset-1">Обновить</button>
+          <h1 class="col-md-4 vcenter">Адресная книга</h1>
+          <label for="filter" class="col-md-1 vcenter">Фильтр</label>
+          <input id="filter" name="filter" class="col-md-2 vcenter" type="search"/>
+          <button id="updater" class="btn col-md-1 col-md-offset-1 vcenter">Обновить</button>
+          <button id="add" class="btn col-md-1 vcenter">Добавить</button>
+          <button id="delete" class="btn col-md-1 vcenter disabled">Удалить</button>
       </div>
       <div id="content" class="row">
           <div id="tablecontent"></div>
