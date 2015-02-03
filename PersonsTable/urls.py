@@ -4,5 +4,7 @@ from Table.views import *
 
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
-    url(r'', get_data),
+    url(r'^home/', index),
+    url(r'^index/', index),
+    url(r'^data/', get_data),
 )

@@ -3,18 +3,35 @@ body {
     font-family: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial;
 }
 
-th {
+#container {
+    margin: 0 2%;
+}
+
+#header {
+    margin: 1% 5%;
+}
+
+#updater {
+    margin-top: 16pt;
+}
+
+.grid {
+    width: 100%;
+}
+
+.grid th {
     background-color: #b1f5ff;
 }
 
-th, td {
+.grid th, .grid td {
     text-align: center !important;
+    padding: 7px;
 }
 
-td {
+.grid td {
     border-bottom: 1px solid black;
 }
 
-table :last-child > td {
+.grid :last-child > td {
     border-bottom: none;
 }

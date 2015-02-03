@@ -5,41 +5,25 @@
     <meta content="text/html" charset="utf-8"/>
 
     <script type="application/javascript" src="/static/js/jquery-2.1.3.min.js"></script>
+    <script type="application/javascript" src="/static/js/editablegrid-2.0.1.js"></script>
+    <script type="application/javascript" src="/static/js/options.js"></script>
     <script type="application/javascript" src="/static/js/table.js"></script>
-    <script src="../../editablegrid-2.0.1.js"></script>
 
-    <link rel="stylesheet" href="../../editablegrid-2.0.1.css" type="text/css" media="screen">
-    <link rel="stylesheet" href="/static/css/base.css"/>
+    <link rel="stylesheet" href="/static/css/editablegrid-2.0.1.css" media="screen">
     <link rel="stylesheet" href="/static/css/bootstrap/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/static/css/base.css"/>
+
 </head>
 <body>
-  <div class="container-fluid">
-      <div class="row">
-          <h1 class="col-md-12">Адресная книга</h1>
+  <div id="container" class="container-fluid">
+      <div id="header" class="row">
+          <h1 class="col-md-11">Адресная книга</h1>
+          <button id="updater" class="btn col-md-1">Обновить</button>
       </div>
-      <div class="row">
-          <table class="table table-striped table-responsive col-md-12">
-              <tr>
-                  <th>ФИО</th>
-                  <th>Пол</th>
-                  <th>Дата рождения</th>
-                  <th>Адрес</th>
-                  <th>Email</th>
-                  <th>Телефон</th>
-              </tr>
-
-              {% for person in persons %}
-              <tr>
-                  <td>{{ person.fullname }}</td>
-                  <td>{{ person.gender }}</td>
-                  <td>{{ person.birthdate }}</td>
-                  <td>{{ person.address }}</td>
-                  <td>{{ person.email }}</td>
-                  <td>{{ person.phone }}</td>
-              </tr>
-              {% endfor %}
-
-          </table>
+      <div id="content" class="row">
+          <div id="tablecontent"></div>
+      </div>
+      <div id="footer" class="row">
       </div>
   </div>
 </body>
