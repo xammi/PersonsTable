@@ -11,8 +11,8 @@ body {
     margin: 1% 5%;
 }
 
-#updater {
-    margin-top: 16pt;
+#header > button, #header > input, #header > label {
+    vertical-align: middle;
 }
 
 .grid {

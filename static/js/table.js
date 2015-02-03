@@ -53,8 +53,9 @@ function fetchData(params, callback) {
 function updateTable() {
     var editableGrid = new EditableGrid("Address Book");
     var metadata = prepareMeta();
+    var filter = $('#filter').val();
 
-    fetchData({}, function (data) {
+    fetchData({'filter': filter}, function (data) {
         editableGrid.load({"metadata": metadata, "data": data});
         editableGrid.renderGrid("tablecontent", "grid");
     });
