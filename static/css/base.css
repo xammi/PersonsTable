@@ -1,0 +1,20 @@
+body {
+    background-color: #e7ffe9;
+    font-family: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial;
+}
+
+th {
+    background-color: #b1f5ff;
+}
+
+th, td {
+    text-align: center !important;
+}
+
+td {
+    border-bottom: 1px solid black;
+}
+
+table :last-child > td {
+    border-bottom: none;
+}

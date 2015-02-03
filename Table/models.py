@@ -9,8 +9,7 @@ class Person(models.Model):
         ('F', 'Female'),
     )
 
-    firstname = models.CharField(max_length=70)
-    surname = models.CharField(max_length=70)
+    fullname = models.CharField(max_length=150)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     birthdate = models.DateField(auto_now_add=True)
 

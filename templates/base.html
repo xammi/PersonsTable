@@ -1,9 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Адресная книга</title>
+    <title>Адресная книга</title>
+    <meta content="text/html" charset="utf-8"/>
+
+    <script type="application/javascript" src="/static/js/jquery-2.1.3.min.js"></script>
+    <script type="application/javascript" src="/static/js/table.js"></script>
+    <script src="../../editablegrid-2.0.1.js"></script>
+
+    <link rel="stylesheet" href="../../editablegrid-2.0.1.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="/static/css/base.css"/>
+    <link rel="stylesheet" href="/static/css/bootstrap/css/bootstrap.min.css"/>
 </head>
 <body>
-  <hr/>
+  <div class="container-fluid">
+      <div class="row">
+          <h1 class="col-md-12">Адресная книга</h1>
+      </div>
+      <div class="row">
+          <table class="table table-striped table-responsive col-md-12">
+              <tr>
+                  <th>ФИО</th>
+                  <th>Пол</th>
+                  <th>Дата рождения</th>
+                  <th>Адрес</th>
+                  <th>Email</th>
+                  <th>Телефон</th>
+              </tr>
+
+              {% for person in persons %}
+              <tr>
+                  <td>{{ person.fullname }}</td>
+                  <td>{{ person.gender }}</td>
+                  <td>{{ person.birthdate }}</td>
+                  <td>{{ person.address }}</td>
+                  <td>{{ person.email }}</td>
+                  <td>{{ person.phone }}</td>
+              </tr>
+              {% endfor %}
+
+          </table>
+      </div>
+  </div>
 </body>
 </html>

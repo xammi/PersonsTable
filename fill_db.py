@@ -163,8 +163,7 @@ def fill_persons():
     while i < PERSONS_AMOUNT:
         person = Person()
 
-        person.firstname = get_first_name()
-        person.surname = get_surname()
+        person.fullname = get_full_name()
         person.gender = 'M'
 
         person.address = get_address()
