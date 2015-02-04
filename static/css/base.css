@@ -15,10 +15,14 @@ body {
     margin-right: 2%;
 }
 
-.vcenter {
+.vcenter, .form-group > label, .form-group > input {
     display: inline-block;
     vertical-align: baseline;
     float: none;
+}
+
+.form-group > input {
+    padding: 0 10px;
 }
 
 .grid {

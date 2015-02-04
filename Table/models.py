@@ -27,11 +27,3 @@ class Person(models.Model):
                     address=self.address,
                     email=self.email,
                     phone=self.phone)
-
-    def match_to(self, pattern):
-        return pattern.match(self.fullname) or \
-               pattern.match(str(self.birthdate)) or \
-               pattern.match(self.gender) or \
-               pattern.match(self.address) or \
-               pattern.match(self.email) or \
-               pattern.match(self.phone)

@@ -1,10 +1,15 @@
+# coding: utf-8
+
 from django.shortcuts import render_to_response
-from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from django.views.decorators.http import require_GET, require_POST
 from django.shortcuts import HttpResponse
-from Table.models import Person
 from django.http import HttpResponseBadRequest
 from json import dumps
 import re
+
+from Table.models import *
+from Table.forms import *
+
 
 def require_AJAX(view):
     def wrap(request, *args, **kwargs):
@@ -17,17 +22,10 @@ def require_AJAX(view):
     return wrap
 
 
-def prepare(queryset, predicate):
-    result = [{'id': query.id, 'values': query.as_dict()}
-              for query in queryset if predicate(query)]
-    return result
-
-
 def response_json(obj):
     return HttpResponse(dumps(obj), mimetype="application/json")
 
 #--------------------------------------------------------------------------------------------------
-
 
 @require_GET
 def index(request):
@@ -39,16 +37,9 @@ def index(request):
 @require_AJAX
 @require_GET
 def get_data(request):
-    filter = request.GET['filter']
-
-    if not filter is None and filter != '':
-        pattern = re.compile(filter)
-        matcher = lambda person: person.match_to(pattern)
-    else:
-        matcher = lambda person: True
-
     persons = Person.objects.all()[:10]
-    data = prepare(persons, matcher)
+    data = [{'id': person.id, 'values': person.as_dict()}
+              for person in persons]
     return response_json(data)
 
 

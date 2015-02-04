@@ -94,3 +94,5 @@ TEMPLATE_DIRS = (
 STATICFILES_DIRS = (
     BASE_DIR + '/static',
 )
+
+CSRF_COOKIE_SECURE = False
