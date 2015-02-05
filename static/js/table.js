@@ -78,6 +78,19 @@ function showAlert(kind, blockId, text) {
         item.html('');
     });
 }
+
+function extractErrors(errors, action) {
+    for (var field in errors) {
+        if (errors.hasOwnProperty(field)) {
+            var fieldErrors = errors[field];
+
+            for (var error in fieldErrors) {
+                if (fieldErrors.hasOwnProperty(error))
+                    action(fieldErrors[error]);
+            }
+        }
+    }
+}
 //-------------------------------------------------------------------------------------------------
 
 function prepareMeta() {
@@ -187,13 +200,9 @@ $(document).ready(function () {
                 showAlert('success', 'gen-alerts', 'New person was successfully added');
             }
             else if (response.status == 'error') {
-                for (var field in response.errors)
-                    if (response.errors.hasOwnProperty(field)) {
-                        var fieldErrors = response.errors[field];
-                        for (var error in fieldErrors)
-                            if (fieldErrors.hasOwnProperty(error))
-                                writeAlert('error', 'form-alerts', fieldErrors[error]);
-                    }
+                extractErrors(response.errors, function (error) {
+                    writeAlert('error', 'form-alerts', error);
+                });
                 showAlert('error', 'form-alerts', '');
             }
         }).fail(function (jqXHR, textStatus) {
