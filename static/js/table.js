@@ -190,8 +190,8 @@ $(document).ready(function () {
         }).done(function (response) {
             if (response.status == 'OK') {
                 var data = response.data;
-                showAlert('success', 'gen-alerts', 'New person was successfully added');
-                // editableGrid.append(data);
+                showAlert('success', 'form-alerts', 'New person was successfully added');
+                editableGrid.append(data.id, data.values);
             }
             else if (response.status == 'error') {
                 extractFieldErrors(response.errors, function (error) {

@@ -98,7 +98,7 @@ def update_person(request):
         person = Person.objects.all().get(id=int(p_id))
         person.__dict__[field] = new_value
         person.save(force_update=True)
-        return response_json(person.as_dict())
+        return response_json({'id': person.id, 'values': person.as_dict()})
 
     except ObjectDoesNotExist:
         msg = '''No person record with such id in DB (id=%s)''' % p_id
