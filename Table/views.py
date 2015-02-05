@@ -23,12 +23,14 @@ def require_AJAX(view):
     return wrap
 
 
-def response_json(obj):
+def response_json(response):
+    obj = {'status': 'OK', 'data': response}
     return HttpResponse(dumps(obj), content_type="application/json")
 
 
-def response_error(msg):
-    return HttpResponseBadRequest(msg)
+def response_error(response):
+    obj = {'status': 'error', 'errors': response}
+    return HttpResponse(dumps(obj), content_type="application/json")
 
 #--------------------------------------------------------------------------------------------------
 
@@ -65,8 +67,7 @@ def add_person(request):
         new_person.save(force_insert=True)
         return response_json(new_person.as_dict())
 
-    errors = form.errors
-    return response_error(errors)
+    return response_error(form.errors)
 
 
 @require_AJAX

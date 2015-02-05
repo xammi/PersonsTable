@@ -24,6 +24,7 @@ class AddPersonForm(ModelForm):
 
         for field in Person.fields():
             if not self.is_field_valid(field, self.data[field]):
+                self.add_error(field, 'Invalid field: ')
                 result = False
 
         return result

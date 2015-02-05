@@ -60,7 +60,7 @@ function validate(params) {
     return true;
 }
 
-function showAlert(kind, blockId, text) {
+function writeAlert(kind, blockId, text) {
     var item;
     var block = $('#' + blockId);
     if (kind === 'success')
@@ -68,8 +68,15 @@ function showAlert(kind, blockId, text) {
     else if (kind === 'error')
         item = block.children('.alert-danger');
 
-    item.html(text);
-    item.fadeIn('slow').delay(10000).fadeOut('slow');
+    item.html(item.html() + '\n\n' + text);
+    return item;
+}
+
+function showAlert(kind, blockId, text) {
+    var item = writeAlert(kind, blockId, text);
+    item.fadeIn('slow').delay(10000).fadeOut('slow', function () {
+        item.html('');
+    });
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -129,16 +136,19 @@ $(document).ready(function () {
             url: '/data/',
             type: 'GET',
             data: {}
-        }).done(function (data) {
-            var phone, date;
+        }).done(function (response) {
+            if (response.status == 'OK') {
+                var phone, date;
+                var data = response.data;
 
-            for (var I in data) {
-                phone = data[I].values.phone;
-                data[I].values.phone = '8(' + phone.substr(0, 3) + ')' + phone.substring(3);
+                for (var I in data) {
+                    phone = data[I].values.phone;
+                    data[I].values.phone = '8(' + phone.substr(0, 3) + ')' + phone.substring(3);
+                }
+
+                editableGrid.load({"metadata": metadata, "data": data});
+                editableGrid.renderGrid("tablecontent", "grid");
             }
-
-            editableGrid.load({"metadata": metadata, "data": data});
-            editableGrid.renderGrid("tablecontent", "grid");
         }).fail(function (jqXHR, textStatus) {
             showAlert('error', 'gen-alerts', 'Unable to update. Please, check the connection.');
         });
@@ -172,13 +182,22 @@ $(document).ready(function () {
             type: 'POST',
             data: params
         }).done(function (response) {
-            showAlert('success', 'gen-alerts', 'New person was successfully added');
-            $('.modal').modal('hide');
+            if (response.status == 'OK') {
+                var data = response.data;
+                showAlert('success', 'gen-alerts', 'New person was successfully added');
+            }
+            else if (response.status == 'error') {
+                for (var field in response.errors)
+                    if (response.errors.hasOwnProperty(field)) {
+                        var fieldErrors = response.errors[field];
+                        for (var error in fieldErrors)
+                            if (fieldErrors.hasOwnProperty(error))
+                                writeAlert('error', 'form-alerts', fieldErrors[error]);
+                    }
+                showAlert('error', 'form-alerts', '');
+            }
         }).fail(function (jqXHR, textStatus) {
-            if (jqXHR.responseText !== 'error')
-                showAlert('error', 'form-alerts', jqXHR.responseText);
-            else
-                showAlert('error', 'form-alerts', 'Please, check the connection.');
+            showAlert('error', 'form-alerts', 'Please, check the connection.');
         });
     }
 
