@@ -39,23 +39,17 @@ var Validators = {
     }
 };
 
+function apply(field, value) {
+    return Validators[field](value);
+}
 
 function validate(params) {
-
-    function apply(field) {
-        var value = params[field];
-        var validator = Validators[field];
-
-        if (! validator(value)) {
-            showAlert('error', 'form-alerts', 'Invalid field: ' + field);
-            return false;
-        }
-        return true;
-    }
-
-    for (var I in Validators)
-        if (Validators.hasOwnProperty(I))
-            if (! apply(I)) return false;
+    for (var field in Validators)
+        if (Validators.hasOwnProperty(field))
+            if (! apply(field, params[field])) {
+                showAlert('error', 'form-alerts', 'Invalid field: ' + field);
+                return false;
+            }
 
     return true;
 }
@@ -80,16 +74,15 @@ function showAlert(kind, blockId, text) {
 }
 
 function extractErrors(errors, action) {
-    for (var field in errors) {
-        if (errors.hasOwnProperty(field)) {
-            var fieldErrors = errors[field];
+    for (var error in errors)
+        if (errors.hasOwnProperty(error))
+            action(errors[error]);
+}
 
-            for (var error in fieldErrors) {
-                if (fieldErrors.hasOwnProperty(error))
-                    action(fieldErrors[error]);
-            }
-        }
-    }
+function extractFieldErrors(errors, action) {
+    for (var field in errors)
+        if (errors.hasOwnProperty(field))
+            extractErrors(errors[field], action);
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -200,7 +193,7 @@ $(document).ready(function () {
                 showAlert('success', 'gen-alerts', 'New person was successfully added');
             }
             else if (response.status == 'error') {
-                extractErrors(response.errors, function (error) {
+                extractFieldErrors(response.errors, function (error) {
                     writeAlert('error', 'form-alerts', error);
                 });
                 showAlert('error', 'form-alerts', '');
@@ -224,14 +217,28 @@ $(document).ready(function () {
             type: 'POST',
             data: params
         }).done(function (response) {
-            alert(response);
+            if (response.status == 'OK') {}
+            else if (response.status == 'error') {
+                extractErrors(response.errors, function (error) {
+                    writeAlert('error', 'gen-alerts', error);
+                });
+                showAlert('error', 'gen-alerts', '');
+            }
         }).fail(function (jqXHR, textStatus) {
-            alert(textStatus);
+            showAlert('error', 'form-alerts', 'Please, check the connection.');
         });
     }
 
-    for (var I = 0; I < editableGrid.getColumnCount(); I++) {
-        var column = editableGrid.getColumn(I);
-        var editor = column.cellEditor();
+    editableGrid.modelChanged = function(rowIndex, columnIndex, oldValue, newValue) {
+        var id = editableGrid.getRowId(rowIndex);
+        var field = editableGrid.getColumnName(columnIndex);
+
+        if (apply(field, newValue)) {
+            updateField(id, field, newValue);
+        }
+        else {
+            showAlert('error', 'gen-alerts', 'Invalid update: ' + field);
+            editableGrid.setValueAt(rowIndex, columnIndex, oldValue);
+        }
     }
 });
