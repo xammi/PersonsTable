@@ -147,6 +147,7 @@ $(document).ready(function () {
     var metadata = prepareMeta();
 
     function updateTable() {
+        $('#spinner-modal').modal('show');
         $.ajax({
             url: '/data/',
             type: 'GET',
@@ -163,9 +164,11 @@ $(document).ready(function () {
 
                 editableGrid.load({"metadata": metadata, "data": data});
                 editableGrid.renderGrid("tablecontent", "grid");
+                $('#spinner-modal').modal('hide');
             }
         }).fail(function (jqXHR, textStatus) {
             showAlert('error', 'gen-alerts', 'Unable to update. Please, check the connection.');
+            $('#spinner-modal').modal('hide');
         });
     }
 
@@ -297,7 +300,7 @@ $(document).ready(function () {
                     editableGrid.removeRow(ids[I]);
 
                 selectedIds = [];
-                deleter.addClass('disable');
+                deleter.addClass('disabled');
             }
             else if (response.status == 'error') {
                 extractErrors(response.errors, function (error) {
