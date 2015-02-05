@@ -7,9 +7,13 @@ from django.template import RequestContext
 from django.shortcuts import HttpResponse
 from django.http import HttpResponseBadRequest
 from json import dumps
+from django.core.exceptions import ObjectDoesNotExist
 
 from Table.models import *
 from Table.forms import *
+
+
+
 
 
 def require_AJAX(view):
@@ -47,7 +51,7 @@ def index(request):
 def get_data(request):
     persons = Person.objects.all()[:10]
     data = [{'id': person.id, 'values': person.as_dict()}
-              for person in persons]
+            for person in persons]
     return response_json(data)
 
 
@@ -73,25 +77,55 @@ def add_person(request):
 @require_AJAX
 @require_POST
 def update_person(request):
-    id = request.POST['id']
+    p_id = request.POST['id']
     field = request.POST['field']
     new_value = request.POST['new_value']
 
-    person = Person.objects.all().filter(id=id)
-    person[field] = new_value
-    person.save(force_update=True)
+    if not p_id or not field or not new_value:
+        msg = '''Update can not be done without id, field or new_value'''
+        return response_error({'Missed parameter': msg})
 
-    new_person = Person()
-    new_person.save()
-    return response_json(new_person.as_dict())
+    if field not in Person.fields():
+        msg = '''Unknown field in person model (%s)''' % field
+        return response_error({'Unknown field': msg})
+
+    form = AddPersonForm()
+    if not form.is_field_valid(field, new_value):
+        msg = '''Invalid new_value (%s) for field (%s)''' % (new_value, field)
+        return response_error({'Invalid value': msg})
+
+    try:
+        person = Person.objects.all().get(id=int(p_id))
+        person.__dict__[field] = new_value
+        person.save(force_update=True)
+        return response_json(person.as_dict())
+
+    except ObjectDoesNotExist:
+        msg = '''No person record with such id in DB (id=%s)''' % p_id
+        return response_error({'Does not exist': msg})
+
+    except TypeError:
+        msg = '''id must be integer (id=%s)''' % p_id
+        return response_error({'Wrong type': msg})
 
 
 @require_AJAX
 @require_POST
 def delete_persons(request):
     ids = request.POST['ids']
-    for id in ids:
-        person = Person.objects.all().filter(id=id)
-        person.delete()
 
-    return response_json({'status': 'OK'})
+    if not ids:
+        msg = '''Unable to delete persons without id list'''
+        return response_error({'Missed parameter': msg})
+
+    # check type of ids
+
+    try:
+        for p_id in ids:
+            person = Person.objects.all().get(id=p_id)
+            person.delete()
+        return response_json({'ids': ids})
+
+    except ObjectDoesNotExist:
+        msg = '''No person record with such id in DB'''
+        return response_error({'Does not exist': msg})

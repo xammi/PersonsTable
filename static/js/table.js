@@ -191,6 +191,7 @@ $(document).ready(function () {
             if (response.status == 'OK') {
                 var data = response.data;
                 showAlert('success', 'gen-alerts', 'New person was successfully added');
+                // editableGrid.append(data);
             }
             else if (response.status == 'error') {
                 extractFieldErrors(response.errors, function (error) {

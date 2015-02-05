@@ -8,11 +8,11 @@ import re
 
 class AddPersonForm(ModelForm):
     reg_exps = {'fullname': ur'[А-ЯA-Z][а-яa-z]+ [А-ЯA-Z][а-яa-z]+',
-                'gender': r'[MF]',
-                'birthdate': r'\d{4}-\d{2}-\d{2}',
+                'gender': ur'[MF]',
+                'birthdate': ur'\d{4}-\d{2}-\d{2}',
                 'address': ur'г. [А-Я][а-я]+, ул. [А-Я][а-я]+, д. \d+',
-                'email': r'\w+@\w+\.[a-z]+',
-                'phone': r'\d{10}',
+                'email': ur'\w+@\w+\.[a-z]+',
+                'phone': ur'\d{10}',
     }
 
     class Meta:
