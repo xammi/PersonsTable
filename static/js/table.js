@@ -258,6 +258,7 @@ $(document).ready(function () {
     };
 
     var selectedIds = [];
+    var deleter = $('#deleter');
 
     function selectionChanged(rowIndex, id, oldValue, newValue) {
         var row = editableGrid.getRow(rowIndex);
@@ -268,24 +269,35 @@ $(document).ready(function () {
             selectedIds = $.grep(selectedIds, function(value) {
                 return value !== id;
             });
+            if (selectedIds.length === 0)
+                deleter.addClass('disabled');
         }
 
         if (oldValue === false && newValue === true) {
             $(row).addClass('selected');
-            selectedIds.push()
+            selectedIds.push(id);
+            deleter.removeClass('disabled');
         }
     }
 
     function deleteSelected() {
+        var params = {ids: selectedIds + ''};
+
         $.ajax({
             url: '/delete/',
             type: 'POST',
-            data: {ids: selectedIds}
+            data: params,
+            dataType: 'json'
         }).done(function (response) {
             if (response.status == 'OK' ) {
                 showAlert('success', 'gen-alerts', 'Successfully deleted');
-                
+
+                var ids = response.data.ids.split(',');
+                for (var I = 0; I < ids.length; I++)
+                    editableGrid.removeRow(ids[I]);
+
                 selectedIds = [];
+                deleter.addClass('disable');
             }
             else if (response.status == 'error') {
                 extractErrors(response.errors, function (error) {
@@ -294,9 +306,9 @@ $(document).ready(function () {
                 showAlert('error', 'gen-alerts', '');
             }
         }).fail(function (jqXHR, textStatus) {
-            showAlert('error', 'form-alerts', 'Please, check the connection.');
+            showAlert('error', 'gen-alerts', 'Please, check the connection.');
         });
     }
 
-    $('#deleter').click(deleteSelected);
+    deleter.click(deleteSelected);
 });

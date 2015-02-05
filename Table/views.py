@@ -46,7 +46,7 @@ def index(request):
 @require_AJAX
 @require_GET
 def get_data(request):
-    persons = Person.objects.all()[:10]
+    persons = Person.objects.all()[:]
     data = [{'id': person.id, 'values': person.as_dict()}
             for person in persons]
     return response_json(data)
@@ -111,14 +111,14 @@ def update_person(request):
 def delete_persons(request):
     ids = request.POST['ids']
 
-    if not ids:
+    if not ids or ids == '':
         msg = '''Unable to delete persons without id list'''
         return response_error({'Missed parameter': msg})
 
-    # check type of ids
-
     try:
-        for p_id in ids:
+        int_ids = [int(p_id) for p_id in ids.split(',')]
+
+        for p_id in int_ids:
             person = Person.objects.all().get(id=p_id)
             person.delete()
         return response_json({'ids': ids})
@@ -126,3 +126,7 @@ def delete_persons(request):
     except ObjectDoesNotExist:
         msg = '''No person record with such id in DB'''
         return response_error({'Does not exist': msg})
+
+    except TypeError:
+        msg = '''ids must be integers (ids = [%s])''' % ids
+        return response_error({'Wrong type': msg})
