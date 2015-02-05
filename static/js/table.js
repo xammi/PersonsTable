@@ -2,43 +2,120 @@
  * Created by max on 03.02.15.
  */
 
+
+var csrftoken = $.cookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+//--------------------------------------------------------------------------------------------
+var Validators = {
+    fullname: function (value) {
+        return /[А-Я|A-Z][а-я|a-z]+ [А-Я|A-Z][а-я|a-z]+/.test(value);
+    },
+    birthdate: function (value) {
+        return /\d{4}-\d{2}-\d{2}/.test(value);
+    },
+    gender: function (value) {
+        return /[M|F]/.test(value);
+    },
+    address: function (value) {
+        return /г. [А-Я][а-я]+, ул. [А-Я][а-я]+, д. \d+/.test(value);
+    },
+    email: function (value) {
+        return /\w+@\w+\.[a-z]+/.test(value);
+    },
+    phone: function (value) {
+        return /8\d{10}/.test(value);
+    }
+};
+
+
+function validate(params) {
+
+    function apply(field) {
+        var value = params[field];
+        var validator = Validators[field];
+
+        if (! validator(value)) {
+            showAlert('error', 'form-alerts', 'Invalid field: ' + field);
+            return false;
+        }
+        return true;
+    }
+
+    for (var I in Validators)
+        if (Validators.hasOwnProperty(I))
+            if (! apply(I)) return false;
+
+    return true;
+}
+
+function showAlert(kind, blockId, text) {
+    var item;
+    var block = $('#' + blockId);
+    if (kind === 'success')
+        item = block.children('.alert-success');
+    else if (kind === 'error')
+        item = block.children('.alert-danger');
+
+    item.html(text);
+    item.fadeIn('slow').delay(10000).fadeOut('slow');
+}
+//-------------------------------------------------------------------------------------------------
+
 function prepareMeta() {
     return [
         {
             name: "fullname",
             label: "ФИО",
             datatype: "string",
-            editable: true
+            editable: true,
+            cellValidators: [new CellValidator({isValid: Validators.fullname})]
         },
         {
             name: "gender",
             label: "Пол",
             datatype: "string",
-            editable: true
+            editable: true,
+            cellValidators: [new CellValidator({isValid: Validators.gender})]
         },
         {
             name: "birthdate",
             label: "Дата рождения",
             datatype: "string",
-            editable: true
+            editable: true,
+            cellValidators: [new CellValidator({isValid: Validators.birthdate})]
         },
         {
             name: "address",
             label: "Адрес",
             datatype: "string",
-            editable: true
+            editable: true,
+            cellValidators: [new CellValidator({isValid: Validators.address})]
         },
         {
             name: "email",
             label: "E-Mail",
             datatype: "email",
-            editable: true
+            editable: true,
+            cellValidators: [new CellValidator({isValid: Validators.email})]
         },
         {
             name: "phone",
             label: "Телефон",
             datatype: "string",
-            editable: true
+            editable: true,
+            cellValidators: [new CellValidator({isValid: Validators.phone})]
         },
     ];
 }
@@ -63,11 +140,12 @@ $(document).ready(function () {
             editableGrid.load({"metadata": metadata, "data": data});
             editableGrid.renderGrid("tablecontent", "grid");
         }).fail(function (jqXHR, textStatus) {
-            alert(textStatus);
+            showAlert('error', 'gen-alerts', 'Unable to update. Please, check the connection.');
         });
     }
 
     updateTable();
+    $('#updater').click(updateTable);
     $('#filter').change(function () {
         var filter = $('#filter').val();
         editableGrid.filter(filter);
@@ -75,10 +153,8 @@ $(document).ready(function () {
 
     function addPerson(event) {
         event.preventDefault();
+
         var form = $(this);
-
-        // validate
-
         var url = form.attr('action');
         var inputs = $('#add-person-form :input');
 
@@ -88,14 +164,21 @@ $(document).ready(function () {
                 params[this.name] = $(this).val();
         });
 
+        if (! validate(params))
+            return false;
+
         $.ajax({
             url: url,
             type: 'POST',
             data: params
         }).done(function (response) {
-            alert(response);
+            showAlert('success', 'gen-alerts', 'New person was successfully added');
+            $('.modal').modal('hide');
         }).fail(function (jqXHR, textStatus) {
-            alert(textStatus);
+            if (jqXHR.responseText !== 'error')
+                showAlert('error', 'form-alerts', jqXHR.responseText);
+            else
+                showAlert('error', 'form-alerts', 'Please, check the connection.');
         });
     }
 
@@ -105,8 +188,8 @@ $(document).ready(function () {
     });
     addForm.submit(addPerson);
 
-    function updateField() {
-        var params = {id: 0, field: 'fullname', new_value: 'Кисленко Максим'};
+    function updateField(id, field, newValue) {
+        var params = {id: id, field: field, new_value: newValue};
 
         $.ajax({
             url: '/update/',
@@ -120,6 +203,7 @@ $(document).ready(function () {
     }
 
     for (var I = 0; I < editableGrid.getColumnCount(); I++) {
-        editableGrid.setCellEditor(I, updateField);
+        var column = editableGrid.getColumn(I);
+        var editor = column.cellEditor();
     }
 });

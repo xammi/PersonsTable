@@ -1,4 +1,5 @@
 from django.db import models
+import datetime
 
 class Person(models.Model):
     GENDER_CHOICES = (
@@ -8,7 +9,7 @@ class Person(models.Model):
 
     fullname = models.CharField(max_length=150)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    birthdate = models.DateField(auto_now_add=True)
+    birthdate = models.DateField(default=datetime.datetime.now)
 
     address = models.CharField(max_length=150)
     email = models.EmailField(max_length=50, unique=True)
@@ -27,3 +28,7 @@ class Person(models.Model):
                     address=self.address,
                     email=self.email,
                     phone=self.phone)
+
+    @staticmethod
+    def fields():
+        return ['fullname', 'gender', 'birthdate', 'address', 'email', 'phone']

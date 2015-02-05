@@ -2,10 +2,11 @@
 
 from django.shortcuts import render_to_response
 from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.template import RequestContext
 from django.shortcuts import HttpResponse
 from django.http import HttpResponseBadRequest
 from json import dumps
-import re
 
 from Table.models import *
 from Table.forms import *
@@ -23,14 +24,19 @@ def require_AJAX(view):
 
 
 def response_json(obj):
-    return HttpResponse(dumps(obj), mimetype="application/json")
+    return HttpResponse(dumps(obj), content_type="application/json")
+
+
+def response_error(msg):
+    return HttpResponseBadRequest(msg)
 
 #--------------------------------------------------------------------------------------------------
 
 @require_GET
+@ensure_csrf_cookie
 def index(request):
     tmpl = "base.html"
-    context = {}
+    context = RequestContext(request)
     return render_to_response(tmpl, context)
 
 
@@ -46,9 +52,21 @@ def get_data(request):
 @require_AJAX
 @require_POST
 def add_person(request):
-    new_person = Person()
-    new_person.save(force_insert=True)
-    return response_json(new_person.as_dict())
+    data = dict(request.POST.iteritems())
+    data['phone'] = data['phone'][1:]
+    form = AddPersonForm(data)
+
+    if form.is_valid():
+        new_person = Person()
+
+        for field in Person.fields():
+            new_person.__dict__[field] = form.cleaned_data[field]
+
+        new_person.save(force_insert=True)
+        return response_json(new_person.as_dict())
+
+    errors = form.errors
+    return response_error(errors)
 
 
 @require_AJAX

@@ -45,3 +45,7 @@ body {
 .grid :last-child > td {
     border-bottom: none;
 }
+
+.alert {
+    display: none;
+}
