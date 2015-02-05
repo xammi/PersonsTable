@@ -13,9 +13,6 @@ from Table.models import *
 from Table.forms import *
 
 
-
-
-
 def require_AJAX(view):
     def wrap(request, *args, **kwargs):
         if not request.is_ajax():

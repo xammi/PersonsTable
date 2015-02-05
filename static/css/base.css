@@ -49,3 +49,7 @@ body {
 .alert {
     display: none;
 }
+
+.selected {
+    background-color: #f0fff0;
+}

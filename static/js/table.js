@@ -36,6 +36,9 @@ var Validators = {
     },
     phone: function (value) {
         return /8\d{10}/.test(value);
+    },
+    selection: function (value) {
+        return true;
     }
 };
 
@@ -130,6 +133,12 @@ function prepareMeta() {
             editable: true,
             cellValidators: [new CellValidator({isValid: Validators.phone})]
         },
+        {
+            name: "selection",
+            label: "#",
+            datatype: "boolean",
+            editable: true
+        }
     ];
 }
 
@@ -234,6 +243,11 @@ $(document).ready(function () {
         var id = editableGrid.getRowId(rowIndex);
         var field = editableGrid.getColumnName(columnIndex);
 
+        if (field === 'selection') {
+            selectionChanged(rowIndex, id, oldValue, newValue);
+            return;
+        }
+
         if (apply(field, newValue)) {
             updateField(id, field, newValue);
         }
@@ -241,5 +255,48 @@ $(document).ready(function () {
             showAlert('error', 'gen-alerts', 'Invalid update: ' + field);
             editableGrid.setValueAt(rowIndex, columnIndex, oldValue);
         }
+    };
+
+    var selectedIds = [];
+
+    function selectionChanged(rowIndex, id, oldValue, newValue) {
+        var row = editableGrid.getRow(rowIndex);
+
+        if (oldValue === true && newValue === false) {
+            $(row).removeClass('selected');
+
+            selectedIds = $.grep(selectedIds, function(value) {
+                return value !== id;
+            });
+        }
+
+        if (oldValue === false && newValue === true) {
+            $(row).addClass('selected');
+            selectedIds.push()
+        }
     }
+
+    function deleteSelected() {
+        $.ajax({
+            url: '/delete/',
+            type: 'POST',
+            data: {ids: selectedIds}
+        }).done(function (response) {
+            if (response.status == 'OK' ) {
+                showAlert('success', 'gen-alerts', 'Successfully deleted');
+                
+                selectedIds = [];
+            }
+            else if (response.status == 'error') {
+                extractErrors(response.errors, function (error) {
+                    writeAlert('error', 'gen-alerts', error);
+                });
+                showAlert('error', 'gen-alerts', '');
+            }
+        }).fail(function (jqXHR, textStatus) {
+            showAlert('error', 'form-alerts', 'Please, check the connection.');
+        });
+    }
+
+    $('#deleter').click(deleteSelected);
 });
