@@ -46,7 +46,7 @@ def index(request):
 @require_AJAX
 @require_GET
 def get_data(request):
-    persons = Person.objects.all()[:]
+    persons = Person.objects.all()
     data = [{'id': person.id, 'values': person.as_dict()}
             for person in persons]
     return response_json(data)

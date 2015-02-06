@@ -156,7 +156,7 @@ os.environ["DJANGO_SETTINGS_MODULE"] = "PersonsTable.settings"
 from Table.models import Person
 from django.db.utils import IntegrityError
 
-PERSONS_AMOUNT = 1000
+PERSONS_AMOUNT = 50
 
 def fill_persons():
     i = 0

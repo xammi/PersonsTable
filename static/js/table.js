@@ -65,15 +65,18 @@ function writeAlert(kind, blockId, text) {
     else if (kind === 'error')
         item = block.children('.alert-danger');
 
-    item.html(item.html() + '\n\n' + text);
+    item.html(item.html() + '&nbsp; \n  &nbsp;' + text);
     return item;
 }
 
 function showAlert(kind, blockId, text) {
     var item = writeAlert(kind, blockId, text);
-    item.fadeIn('slow').delay(10000).fadeOut('slow', function () {
-        item.html('');
-    });
+
+    if (item.css('display') == 'none') {
+        item.fadeIn('slow').delay(10000).fadeOut('slow', function () {
+            item.html('');
+        });
+    }
 }
 
 function extractErrors(errors, action) {
@@ -314,4 +317,5 @@ $(document).ready(function () {
     }
 
     deleter.click(deleteSelected);
+    editableGrid.filter('');
 });
